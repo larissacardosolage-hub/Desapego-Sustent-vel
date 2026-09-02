@@ -1,1 +1,988 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EcoDesapego - Plataforma de Desapego Sustentável</title>
+  <style>
+    /* ==========================================================================
+       1. VARIÁVEIS DE DESIGN, PALETA DE CORES E TEMAS DE ACESSIBILIDADE
+       ========================================================================== */
+    :root {
+      /* Paleta Sustentável com Contraste Acessível (WCAG 2.1 AA/AAA) */
+      --primaria-escura: #113826;
+      --primaria: #226846;
+      --primaria-clara: #429b6c;
+      --fundo-destaque: #e8f5e9;
+      --cor-destaque: #d97706;
+      
+      /* Cores de Fundo e Texto */
+      --fundo-principal: #f4f7f5;
+      --fundo-cartao: #ffffff;
+      --texto-principal: #1a221e;
+      --texto-suave: #4a5568;
+      --cor-borda: #cbd5e1;
+      
+      /* Acessibilidade de Foco por Teclado */
+      --anel-foco: #2563eb;
+      --contorno-foco: 3px solid var(--anel-foco);
 
+      /* Dimensões e Sombra */
+      --largura-maxima: 1100px;
+      --raio-grande: 16px;
+      --raio-medio: 10px;
+      --sombra-suave: 0 2px 4px rgba(0, 0, 0, 0.06);
+      --sombra-media: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    /* Suporte Automático ao Tema Escuro do Navegador/Sistema */
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --fundo-principal: #121915;
+        --fundo-cartao: #1c2621;
+        --texto-principal: #f1f5f3;
+        --texto-suave: #a0aec0;
+        --cor-borda: #334155;
+        --fundo-destaque: #1c3829;
+        --anel-foco: #60a5fa;
+      }
+    }
+
+    /* Reset Universal e Acessível */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background-color: var(--fundo-principal);
+      color: var(--texto-principal);
+      line-height: 1.6;
+      font-size: 1.05rem;
+    }
+
+    /* Link Oculto de Atalho para Teclado/Leitor de Tela */
+    .link-atalho {
+      position: absolute;
+      top: -120px;
+      left: 1rem;
+      background: var(--primaria-escura);
+      color: #ffffff;
+      padding: 0.8rem 1.2rem;
+      z-index: 1000;
+      text-decoration: none;
+      font-weight: bold;
+      border-radius: 0 0 var(--raio-medio) var(--raio-medio);
+      transition: top 0.2s ease;
+    }
+
+    .link-atalho:focus {
+      top: 0;
+      outline: var(--contorno-foco);
+    }
+
+    /* Foco Visível Obrigatório em Elementos Interativos */
+    *:focus-visible {
+      outline: var(--contorno-foco) !important;
+      outline-offset: 3px;
+    }
+
+    /* Esconder Elementos Mantendo Acessibilidade aos Leitores de Tela */
+    .apenas-leitor-tela {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* Redução de Animações para Usuários Sensíveis a Movimento */
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation: none !important;
+        transition: none !important;
+      }
+    }
+
+    /* ==========================================================================
+       2. CABEÇALHO E NAVEGAÇÃO
+       ========================================================================== */
+    header {
+      background-color: var(--primaria-escura);
+      color: #ffffff;
+      padding: 1.25rem 1rem;
+      border-bottom: 4px solid var(--primaria-clara);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .conteiner-cabecalho {
+      max-width: var(--largura-maxima);
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .marca {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      color: #ffffff;
+    }
+
+    .marca-icone {
+      width: 44px;
+      height: 44px;
+      background-color: var(--primaria-clara);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+
+    .marca-texto h1 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      line-height: 1.2;
+    }
+
+    .marca-texto p {
+      font-size: 0.85rem;
+      color: #d1e7dd;
+    }
+
+    nav ul {
+      display: flex;
+      list-style: none;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    nav a {
+      color: #ffffff;
+      text-decoration: none;
+      padding: 0.5rem 0.9rem;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: background-color 0.2s;
+    }
+
+    nav a:hover, nav a:focus {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+
+    /* ==========================================================================
+       3. CONTEÚDO PRINCIPAL E SEÇÕES
+       ========================================================================== */
+    main {
+      max-width: var(--largura-maxima);
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+
+    section {
+      margin-bottom: 4rem;
+      scroll-margin-top: 100px;
+    }
+
+    .secao-cabecalho {
+      margin-bottom: 2rem;
+    }
+
+    .secao-titulo {
+      font-size: 1.8rem;
+      color: var(--primaria-escura);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.4rem;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .secao-titulo {
+        color: var(--primaria-clara);
+      }
+    }
+
+    .secao-subtitulo {
+      color: var(--texto-suave);
+      font-size: 1.05rem;
+    }
+
+    /* BANNER INÍCIO (HERO) */
+    .banner-principal {
+      background: linear-gradient(135deg, var(--primaria-escura) 0%, var(--primaria) 100%);
+      color: #ffffff;
+      padding: 3rem 2rem;
+      border-radius: var(--raio-grande);
+      box-shadow: var(--sombra-media);
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      align-items: flex-start;
+    }
+
+    .banner-etiqueta {
+      background-color: var(--primaria-clara);
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 0.85rem;
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .banner-principal h2 {
+      font-size: 2.2rem;
+      line-height: 1.25;
+      max-width: 800px;
+    }
+
+    .banner-principal p {
+      font-size: 1.15rem;
+      max-width: 750px;
+      line-height: 1.7;
+      color: #e2f1e8;
+    }
+
+    .banner-acoes {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-top: 0.5rem;
+    }
+
+    .botao-principal {
+      background-color: #ffffff;
+      color: var(--primaria-escura);
+      padding: 0.85rem 1.6rem;
+      border-radius: var(--raio-medio);
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 1rem;
+      box-shadow: var(--sombra-suave);
+      display: inline-block;
+      transition: background-color 0.2s, transform 0.1s;
+    }
+
+    .botao-principal:hover {
+      background-color: var(--fundo-destaque);
+      color: var(--primaria);
+    }
+
+    .botao-secundario {
+      background-color: transparent;
+      color: #ffffff;
+      border: 2px solid #ffffff;
+      padding: 0.85rem 1.6rem;
+      border-radius: var(--raio-medio);
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 1rem;
+      display: inline-block;
+      transition: background-color 0.2s;
+    }
+
+    .botao-secundario:hover {
+      background-color: rgba(255, 255, 255, 0.15);
+    }
+
+    /* SEÇÃO: ALGUMAS DICAS (4 Dicas em Grid) */
+    .grade-dicas {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .cartao-dica {
+      background-color: var(--fundo-cartao);
+      border: 1px solid var(--cor-borda);
+      border-radius: var(--raio-grande);
+      padding: 1.75rem;
+      box-shadow: var(--sombra-suave);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .numero-dica {
+      width: 36px;
+      height: 36px;
+      background-color: var(--fundo-destaque);
+      color: var(--primaria-escura);
+      font-weight: 800;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+      font-size: 1.1rem;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .numero-dica {
+        color: var(--primaria-clara);
+      }
+    }
+
+    .cartao-dica h3 {
+      font-size: 1.25rem;
+      margin-bottom: 0.6rem;
+      color: var(--texto-principal);
+    }
+
+    .cartao-dica p {
+      color: var(--texto-suave);
+      font-size: 0.98rem;
+      line-height: 1.6;
+    }
+
+    /* SEÇÃO: COMO USAR O APLICATIVO E FAZER O DESAPEGO */
+    .como-funciona {
+      background-color: var(--fundo-cartao);
+      border: 1px solid var(--cor-borda);
+      border-radius: var(--raio-grande);
+      padding: 2.5rem 2rem;
+      box-shadow: var(--sombra-suave);
+      margin-top: 2rem;
+    }
+
+    .como-funciona-titulo {
+      font-size: 1.5rem;
+      color: var(--primaria-escura);
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .como-funciona-titulo {
+        color: var(--primaria-clara);
+      }
+    }
+
+    .conteiner-passos {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem;
+      position: relative;
+    }
+
+    .caixa-passo {
+      background-color: var(--fundo-principal);
+      border-radius: var(--raio-medio);
+      padding: 1.5rem;
+      border-left: 4px solid var(--primaria);
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .etiqueta-passo {
+      font-size: 0.8rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: var(--primaria);
+      letter-spacing: 0.5px;
+    }
+
+    .caixa-passo h4 {
+      font-size: 1.1rem;
+      color: var(--texto-principal);
+    }
+
+    .caixa-passo p {
+      font-size: 0.92rem;
+      color: var(--texto-suave);
+    }
+
+    /* SEÇÃO: EXPLORAR E FILTRAR ITENS (FILTRO 100% CSS) */
+    .controles-filtro {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+    }
+
+    .botao-filtro {
+      padding: 0.5rem 1.2rem;
+      border: 2px solid var(--primaria);
+      background: transparent;
+      color: var(--texto-principal);
+      border-radius: 30px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: background-color 0.2s, color 0.2s;
+    }
+
+    /* Estados dos Filtros CSS */
+    #filter-all:checked ~ .controles-filtro label[for="filter-all"],
+    #filter-roupas:checked ~ .controles-filtro label[for="filter-roupas"],
+    #filter-eletronicos:checked ~ .controles-filtro label[for="filter-eletronicos"],
+    #filter-livros:checked ~ .controles-filtro label[for="filter-livros"] {
+      background-color: var(--primaria);
+      color: #ffffff;
+    }
+
+    #filter-roupas:checked ~ .grade-itens .cartao-item:not([data-category="roupas"]),
+    #filter-eletronicos:checked ~ .grade-itens .cartao-item:not([data-category="eletronicos"]),
+    #filter-livros:checked ~ .grade-itens .cartao-item:not([data-category="livros"]) {
+      display: none;
+    }
+
+    .grade-itens {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .cartao-item {
+      background-color: var(--fundo-cartao);
+      border: 1px solid var(--cor-borda);
+      border-radius: var(--raio-grande);
+      overflow: hidden;
+      box-shadow: var(--sombra-suave);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .icone-item-placeholder {
+      height: 150px;
+      background-color: var(--fundo-destaque);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3.5rem;
+    }
+
+    .conteudo-item {
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+    }
+
+    .etiqueta-item {
+      align-self: flex-start;
+      background-color: var(--fundo-destaque);
+      color: var(--primaria-escura);
+      font-size: 0.75rem;
+      font-weight: bold;
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+      margin-bottom: 0.5rem;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .etiqueta-item {
+        color: var(--primaria-clara);
+      }
+    }
+
+    .titulo-item {
+      font-size: 1.1rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .descricao-item {
+      font-size: 0.9rem;
+      color: var(--texto-suave);
+      margin-bottom: 1rem;
+      flex-grow: 1;
+    }
+
+    .rodape-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--cor-borda);
+      font-size: 0.85rem;
+      color: var(--texto-suave);
+    }
+
+    .botao-interesse {
+      background-color: var(--primaria);
+      color: #ffffff;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: var(--raio-medio);
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      text-align: center;
+    }
+
+    .botao-interesse:hover {
+      background-color: var(--primaria-escura);
+    }
+
+    /* SEÇÃO: FORMULÁRIO DE CADASTRO */
+    .conteiner-formulario {
+      background-color: var(--fundo-cartao);
+      border: 1px solid var(--cor-borda);
+      border-radius: var(--raio-grande);
+      padding: 2rem;
+      box-shadow: var(--sombra-suave);
+    }
+
+    .grupo-formulario {
+      margin-bottom: 1.5rem;
+    }
+
+    .grupo-formulario label {
+      display: block;
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+      color: var(--texto-principal);
+    }
+
+    .ajuda-formulario {
+      font-size: 0.85rem;
+      color: var(--texto-suave);
+      margin-bottom: 0.4rem;
+    }
+
+    .campo-formulario {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      font-size: 1rem;
+      border: 2px solid var(--cor-borda);
+      border-radius: var(--raio-medio);
+      background-color: var(--fundo-principal);
+      color: var(--texto-principal);
+      font-family: inherit;
+    }
+
+    .campo-formulario:focus {
+      border-color: var(--primaria);
+    }
+
+    textarea.campo-formulario {
+      resize: vertical;
+      min-height: 110px;
+    }
+
+    .grupo-radio {
+      display: flex;
+      gap: 1.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .opcao-radio {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: normal;
+      cursor: pointer;
+    }
+
+    .opcao-radio input[type="radio"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--primaria);
+    }
+
+    .botao-enviar {
+      background-color: var(--primaria);
+      color: #ffffff;
+      border: none;
+      padding: 0.9rem 2rem;
+      font-size: 1rem;
+      font-weight: 700;
+      border-radius: var(--raio-medio);
+      cursor: pointer;
+      width: 100%;
+      transition: background-color 0.2s;
+    }
+
+    .botao-enviar:hover {
+      background-color: var(--primaria-escura);
+    }
+
+    /* RODAPÉ ACESSÍVEL */
+    footer {
+      background-color: var(--primaria-escura);
+      color: #ffffff;
+      padding: 3rem 1rem 1.5rem 1rem;
+      margin-top: 4rem;
+      border-top: 4px solid var(--primaria-clara);
+    }
+
+    .conteiner-rodape {
+      max-width: var(--largura-maxima);
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .coluna-rodape h3 {
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+      color: var(--primaria-clara);
+    }
+
+    .coluna-rodape ul {
+      list-style: none;
+    }
+
+    .coluna-rodape li {
+      margin-bottom: 0.5rem;
+    }
+
+    .coluna-rodape a {
+      color: #e2f1e8;
+      text-decoration: none;
+    }
+
+    .coluna-rodape a:hover {
+      text-decoration: underline;
+    }
+
+    .rodape-inferior {
+      max-width: var(--largura-maxima);
+      margin: 0 auto;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.15);
+      text-align: center;
+      font-size: 0.9rem;
+      color: #a0aec0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Link de Acessibilidade Obrigatório -->
+  <a href="#main-content" class="link-atalho">Pular para o conteúdo principal</a>
+
+  <!-- Cabeçalho da Aplicação -->
+  <header role="banner">
+    <div class="conteiner-cabecalho">
+      <a href="#inicio" class="marca" aria-label="EcoDesapego - Ir para o início">
+        <div class="marca-icone" aria-hidden="true">🌱</div>
+        <div class="marca-texto">
+          <h1>EcoDesapego</h1>
+          <p>Conectando desapegos e sustentabilidade</p>
+        </div>
+      </a>
+      
+      <nav aria-label="Navegação Principal">
+        <ul>
+          <li><a href="#inicio">Início</a></li>
+          <li><a href="#dicas">Algumas Dicas</a></li>
+          <li><a href="#explorar">Ver Itens</a></li>
+          <li><a href="#desapegar">Cadastrar</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Conteúdo Principal -->
+  <main id="main-content" tabIndex="-1">
+
+    <!-- 1. SEÇÃO INÍCIO (BANNER SOBRE O ASSUNTO) -->
+    <section id="inicio" aria-labelledby="inicio-heading">
+      <div class="banner-principal">
+        <span class="banner-etiqueta">Economia Circular & Impacto Social</span>
+        <h2 id="inicio-heading">Dê um novo destino ao que está parado e reduza o desperdício</h2>
+        <p>
+          O EcoDesapego é uma plataforma feita para incentivar a doação e a troca responsável de objetos na sua comunidade. Ao reusar móveis, roupas, eletrônicos e livros, você economiza recursos naturais, fortalece conexões humanas e diminui o acúmulo de resíduos no planeta.
+        </p>
+        <div class="banner-acoes">
+          <a href="#desapegar" class="botao-principal">Fazer um Desapego</a>
+          <a href="#dicas" class="botao-secundario">Aprender Como Funciona</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. SEÇÃO ALGUMAS DICAS & INFORMAÇÕES DE COMO USAR O APLICATIVO -->
+    <section id="dicas" aria-labelledby="dicas-heading">
+      <div class="secao-cabecalho">
+        <h2 id="dicas-heading" class="secao-titulo">
+          <span aria-hidden="true">💡</span> Algumas Dicas para um Desapego Consciente
+        </h2>
+        <p class="secao-subtitulo">
+          Siga estas 4 orientações fundamentais para facilitar a sua organização e colaborar com o planeta.
+        </p>
+      </div>
+
+      <!-- GRID COM AS 4 DICAS -->
+      <div class="grade-dicas">
+        <article class="cartao-dica">
+          <div class="numero-dica" aria-hidden="true">1</div>
+          <h3>Regra dos 6 Meses</h3>
+          <p>Se você não utiliza uma roupa, livro ou utensílio há mais de 6 meses (exceto roupas de inverno/verão), é um forte indicativo de que ele será mais útil para outra pessoa.</p>
+        </article>
+
+        <article class="cartao-dica">
+          <div class="numero-dica" aria-hidden="true">2</div>
+          <h3>Higienização e Cuidado</h3>
+          <p>Lave as peças de vestuário, limpe a poeira dos objetos e garanta que todos os acessórios estejam juntos. Entregar algo em bom estado demonstra respeito e carinho.</p>
+        </article>
+
+        <article class="cartao-dica">
+          <div class="numero-dica" aria-hidden="true">3</div>
+          <h3>Atenção ao Lixo Eletrônico</h3>
+          <p>Aparelhos quebrados não devem ser doados sem aviso e nem descartados no lixo comum. Leve-os a Ecopontos ou Postos de Entrega Voluntária (PEV) de reciclagem eletrônica.</p>
+        </article>
+
+        <article class="cartao-dica">
+          <div class="numero-dica" aria-hidden="true">4</div>
+          <h3>Método de Organização</h3>
+          <p>Separar seus pertences em três caixas organizadoras: <strong>Ficar</strong>, <strong>Doar/Trocar</strong> e <strong>Reciclar</strong> ajuda a tomar decisões de desapego mais rápidas e objetivas.</p>
+        </article>
+      </div>
+
+      <!-- INFORMAÇÕES DE COMO USAR O APLICATIVO E FAZER O DESAPEGO -->
+      <div class="como-funciona" aria-labelledby="how-it-works-heading">
+        <h3 id="how-it-works-heading" class="como-funciona-titulo">
+          📲 Como usar o aplicativo e fazer o seu desapego
+        </h3>
+
+        <div class="conteiner-passos">
+          <div class="caixa-passo">
+            <span class="etiqueta-passo">Passo 1</span>
+            <h4>Selecione o Item</h4>
+            <p>Escolha em sua casa aquilo que você não usa mais, verificando seu estado de conservação e limpeza.</p>
+          </div>
+
+          <div class="caixa-passo">
+            <span class="etiqueta-passo">Passo 2</span>
+            <h4>Preencha o Formulário</h4>
+            <p>Vá até a aba "Cadastrar", insira o nome do objeto, categoria, fotos/descrição e sua localização.</p>
+          </div>
+
+          <div class="caixa-passo">
+            <span class="etiqueta-passo">Passo 3</span>
+            <h4>Aguarde o Contato</h4>
+            <p>Outras pessoas interessadas visualizarão o item publicado e poderão combinar a retirada com você.</p>
+          </div>
+
+          <div class="caixa-passo">
+            <span class="etiqueta-passo">Passo 4</span>
+            <h4>Entregue e Celebre!</h4>
+            <p>Combine a entrega em um local seguro ou público da sua cidade e celebre o impacto positivo do reuso!</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. SEÇÃO EXPLORAR ITENS CADASTRADOS -->
+    <section id="explorar" aria-labelledby="explorar-heading">
+      <div class="secao-cabecalho">
+        <h2 id="explorar-heading" class="secao-titulo">
+          <span aria-hidden="true">📦</span> Itens Disponíveis para Reuso
+        </h2>
+        <p class="secao-subtitulo">
+          Navegue pelos desapegos disponíveis na comunidade.
+        </p>
+      </div>
+
+      <!-- Controles de Filtro CSS puro -->
+      <input type="radio" id="filter-all" name="category-filter" class="apenas-leitor-tela" checked>
+      <input type="radio" id="filter-roupas" name="category-filter" class="apenas-leitor-tela">
+      <input type="radio" id="filter-eletronicos" name="category-filter" class="apenas-leitor-tela">
+      <input type="radio" id="filter-livros" name="category-filter" class="apenas-leitor-tela">
+
+      <div class="controles-filtro" role="group" aria-label="Filtrar itens por categoria">
+        <label for="filter-all" class="botao-filtro" tabIndex="0" role="button">Todos os Itens</label>
+        <label for="filter-roupas" class="botao-filtro" tabIndex="0" role="button">Roupas</label>
+        <label for="filter-eletronicos" class="botao-filtro" tabIndex="0" role="button">Eletrônicos</label>
+        <label for="filter-livros" class="botao-filtro" tabIndex="0" role="button">Livros</label>
+      </div>
+
+      <div class="grade-itens">
+        <article class="cartao-item" data-category="roupas">
+          <div class="icone-item-placeholder" aria-label="Desenho de casaco">🧥</div>
+          <div class="conteudo-item">
+            <span class="etiqueta-item">Roupas</span>
+            <h3 class="titulo-item">Casaco Inverno Adulto</h3>
+            <p class="descricao-item">Tamanho GG, impermeável, sem rasgos ou manchas. Pronto para uso.</p>
+            <div class="rodape-item">
+              <span>São Paulo, SP</span>
+              <a href="#desapegar" class="botao-interesse" aria-label="Tenho interesse no Casaco Inverno Adulto">Tenho Interesse</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="cartao-item" data-category="eletronicos">
+          <div class="icone-item-placeholder" aria-label="Desenho de monitor">🖥️</div>
+          <div class="conteudo-item">
+            <span class="etiqueta-item">Eletrônicos</span>
+            <h3 class="titulo-item">Monitor 21.5" Full HD</h3>
+            <p class="descricao-item">Acompanha cabo HDMI e fonte original. Testado e funcionando perfeitamente.</p>
+            <div class="rodape-item">
+              <span>Campinas, SP</span>
+              <a href="#desapegar" class="botao-interesse" aria-label="Tenho interesse no Monitor Full HD">Tenho Interesse</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="cartao-item" data-category="livros">
+          <div class="icone-item-placeholder" aria-label="Desenho de livros">📚</div>
+          <div class="conteudo-item">
+            <span class="etiqueta-item">Livros</span>
+            <h3 class="titulo-item">Coleção Clássicos da Literatura</h3>
+            <p class="descricao-item">Conjunto com 5 livros em bom estado para leitura. Páginas amareladas pelo tempo.</p>
+            <div class="rodape-item">
+              <span>Curitiba, PR</span>
+              <a href="#desapegar" class="botao-interesse" aria-label="Tenho interesse na Coleção Clássicos da Literatura">Tenho Interesse</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="cartao-item" data-category="roupas">
+          <div class="icone-item-placeholder" aria-label="Desenho de tênis">👟</div>
+          <div class="conteudo-item">
+            <span class="etiqueta-item">Roupas</span>
+            <h3 class="titulo-item">Tênis Esportivo Nº 38</h3>
+            <p class="descricao-item">Pouco usado, devidamente higienizado. Excelente para corridas e caminhadas.</p>
+            <div class="rodape-item">
+              <span>Niterói, RJ</span>
+              <a href="#desapegar" class="botao-interesse" aria-label="Tenho interesse no Tênis Esportivo">Tenho Interesse</a>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- 4. SEÇÃO FORMULÁRIO DE CADASTRO -->
+    <section id="desapegar" aria-labelledby="form-heading">
+      <div class="secao-cabecalho">
+        <h2 id="form-heading" class="secao-titulo">
+          <span aria-hidden="true">✍️</span> Cadastrar um Novo Desapego
+        </h2>
+        <p class="secao-subtitulo">
+          Preencha os campos abaixo para disponibilizar um objeto para doação ou troca.
+        </p>
+      </div>
+
+      <div class="conteiner-formulario">
+        <form action="#" method="post">
+
+          <div class="grupo-formulario">
+            <label for="item-title">Título do Item <span aria-hidden="true">*</span></label>
+            <p class="ajuda-formulario" id="title-help">Coloque um título claro (ex: Cadeira de Balanço em Madeira).</p>
+            <input 
+              type="text" 
+              id="item-title" 
+              name="item-title" 
+              class="campo-formulario" 
+              required 
+              aria-required="true"
+              aria-describedby="title-help"
+              placeholder="Digite o título do objeto"
+            >
+          </div>
+
+          <div class="grupo-formulario">
+            <label for="item-category">Categoria <span aria-hidden="true">*</span></label>
+            <select id="item-category" name="item-category" class="campo-formulario" required aria-required="true">
+              <option value="">Selecione uma categoria...</option>
+              <option value="roupas">Roupas e Acessórios</option>
+              <option value="eletronicos">Eletrônicos e Utensílios</option>
+              <option value="livros">Livros e Brinquedos</option>
+              <option value="moveis">Móveis e Decoração</option>
+              <option value="outros">Outros Objetos</option>
+            </select>
+          </div>
+
+          <div class="grupo-formulario">
+            <fieldset>
+              <legend class="grupo-formulario label">Modalidade <span aria-hidden="true">*</span></legend>
+              <div class="grupo-radio">
+                <label class="opcao-radio">
+                  <input type="radio" name="modalidade" value="doacao" checked>
+                  Doação Direta
+                </label>
+                <label class="opcao-radio">
+                  <input type="radio" name="modalidade" value="troca">
+                  Troca Sustentável
+                </label>
+              </div>
+            </fieldset>
+          </div>
+
+          <div class="grupo-formulario">
+            <label for="item-desc">Descrição e Estado de Conservação <span aria-hidden="true">*</span></label>
+            <p class="ajuda-formulario" id="desc-help">Descreva o tamanho, cor, condições de uso e detalhes importantes.</p>
+            <textarea 
+              id="item-desc" 
+              name="item-desc" 
+              class="campo-formulario" 
+              required 
+              aria-required="true"
+              aria-describedby="desc-help"
+              placeholder="Ex: Em bom estado, com pequenos sinais de uso..."
+            ></textarea>
+          </div>
+
+          <div class="grupo-formulario">
+            <label for="user-location">Cidade / Bairro <span aria-hidden="true">*</span></label>
+            <input 
+              type="text" 
+              id="user-location" 
+              name="user-location" 
+              class="campo-formulario" 
+              required 
+              aria-required="true"
+              placeholder="Ex: Rio de Janeiro - Copacabana"
+            >
+          </div>
+
+          <button type="submit" class="botao-enviar">Publicar Desapego</button>
+        </form>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Rodapé da Aplicação -->
+  <footer role="contentinfo">
+    <div class="conteiner-rodape">
+      <div class="coluna-rodape">
+        <h3>EcoDesapego</h3>
+        <p>Promovendo o reuso consciente, reduzindo resíduos e aproximando pessoas através da economia circular.</p>
+      </div>
+
+      <div class="coluna-rodape">
+        <h3>Navegação Rápida</h3>
+        <ul>
+          <li><a href="#inicio">Início (Banner)</a></li>
+          <li><a href="#dicas">4 Dicas & Como Funciona</a></li>
+          <li><a href="#explorar">Ver Itens Disponíveis</a></li>
+          <li><a href="#desapegar">Cadastrar Novo Item</a></li>
+        </ul>
+      </div>
+
+      <div class="coluna-rodape">
+        <h3>Acessibilidade e Tecnologia</h3>
+        <p>Desenvolvido exclusivamente com HTML e CSS semântico, seguindo os padrões WCAG 2.1 de acessibilidade universal.</p>
+      </div>
+    </div>
+
+    <div class="rodape-inferior">
+      <p>&copy; 2026 EcoDesapego - Plataforma de Desapego Sustentável.</p>
+    </div>
+  </footer>
+
+</body>
+</html>
